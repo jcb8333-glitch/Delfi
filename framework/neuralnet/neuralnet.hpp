@@ -10,11 +10,18 @@ class Linear {
     private:
         Tensor<T> lastInput_;
         Tensor<T> weights_;
+        T learningRate_ = T(0.01);
         T bias_;
 
-        void updateWeights(){}
-
-        void updateBias(){}
+        void updateWeights(const Tensor<T>& wGrad){}
+            auto& w = weights_.data();
+            const auto& grad = wGrad.data();
+            for(size_t i = 0; i < w.size(); ++i){
+                w[i] -= learningRate_ * g[i];
+            }
+        void updateBias(T b){
+            bias_ -= learningRate_ * b;
+        }
 
     public:
         Linear(size_t inFeats, size_t outFeats, bool bias=true)
@@ -32,34 +39,28 @@ class Linear {
         }
 
         void backward(const Tensor<T>& lGrad){
-            Tensor<T> wGrad = Tensor<T>({1},0);
-            Tensor<T> bGrad = Tensor<T>({1},0);
-            auto& data = lGrad.data();
+            size_t inFeats = weights_.size();
+            size_t batchSize = lGrad.size();
 
-            for(size_t i = 0; i < lGrad.size(); ++i){
-                wGrad(0) += data[i] * lastInput_.data()[i];
+            Tensor<T> wGrad = Tensor<T>({inFeats}, T(0));
+            T bGrad = T(0);
+
+            const auto& gradData = lGrad.data();
+            const auto& inputData = lastInput_.data();
+            auto& wGradData = wGrad.data();
+
+            for (size_t i = 0; i < batchSize; ++i){
+                T g = gradData[i];
+                bGrad += g;
+
+                size_t base = i * inFeats;
+                for (size_t j = 0; j < inFeats; ++j){
+                    wGradData[j] += g * inputData[base + j];
+                }
             }
-            for(size_t i = 0; i < lGrad.size(); ++i){
-                bGrad(0) += data[i];
-            }
+
             updateWeights(wGrad);
             updateBias(bGrad);
-        }
-
-};
-
-template <typename T>
-class ReLU {
-
-    public:
-        ReLU(){}
-
-        Tensor<T> relu(Tensor<T> x){
-            auto& data = x.data();
-            for(size_t i = 0; i < x.size(); ++i){
-                if(data[i] < 0) data[i] = 0;
-            }
-            return x;
         }
 
 };
