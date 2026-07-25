@@ -7,11 +7,11 @@
 template <typename T>
 class MSEloss{
     private:
-        Tensor<float> lastDiff_;
+        Tensor<T> lastDiff_;
     public:
         MSEloss() : lastDiff_({1}, T(0)){}
 
-        Tensor<T> forward(Tensor<T>& actual, Tensor<T>& prediction){
+        Tensor<T> forward(const Tensor<T>& actual, const Tensor<T>& prediction){
             Tensor<T> diff = Tensor<T>::subtract(prediction, actual);
 
             Tensor<T> square = diff;
@@ -30,7 +30,7 @@ class MSEloss{
             T scale = T(2) / T(lastDiff_.size());
 
             for (size_t i = 0; i < data.size(); ++i){
-                d[i] *= scale;
+                data[i] *= scale;
             }
 
             return grad;
