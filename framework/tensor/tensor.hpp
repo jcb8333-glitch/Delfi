@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <type_traits>
 #include <string>
 #include <ostream>
 #include <algorithm>
@@ -45,11 +46,40 @@ class Tensor {
             return out;
         }
 
+        void collect(const T& val, std::vector<size_t& outShape, std::vector<T>& outData, size_t depth){
+            outData.push_back(val);
+        }
+        template <typename U>
+        void collect(const std::vector<U>& val, std::vector<size_t> outShape, std::vector<size_t> outData, size_t depth){
+            if(outShape.size() <= depth){
+                outShape.push_back(val.size());  
+            }
+            unwrap(val, outShape, outData);
+        }
+
+        template <typename U>
+        void unwrap(const std::vector<U>& val, std::vector<size_t>& outShape, std::vector<T>& outData, size_t depth){
+            for(const auto& item : val){
+                collect(item, outShape, outData, depth +1);
+            }
+        }
+
     public:
         Tensor(std::vector<size_t> shape, const T& initial_val = T()) : shape_(std::move(shape)){
             size_t size = 1;
             for(auto dim : shape_) size *= dim;
             data_.assign(size, initial_val);
+            computeStrides();
+        }
+
+        template <typename U>
+        Tensor(const std::vector<U> list){
+            std::vector<size_t> outShape;
+            std::vector<T> outData;
+            collect(list, outShape, outData, 0);
+
+            shape_ = outShape;
+            data_ = outdata;
             computeStrides();
         }
 
