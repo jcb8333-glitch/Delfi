@@ -5,7 +5,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(dlf, m) {
+PYBIND11_MODULE(_dlf, m) {
     bind_tensor(m);
     bind_loss(m);
     bind_neural_net(m);
