@@ -13,19 +13,20 @@ class Linear {
         T learningRate_ = T(0.01);
         T bias_;
 
-        void updateWeights(const Tensor<T>& wGrad){}
+        void updateWeights(const Tensor<T>& wGrad){
             auto& w = weights_.data();
             const auto& grad = wGrad.data();
             for(size_t i = 0; i < w.size(); ++i){
-                w[i] -= learningRate_ * g[i];
+                w[i] -= learningRate_ * grad[i];
             }
+        }
         void updateBias(T b){
             bias_ -= learningRate_ * b;
         }
 
     public:
         Linear(size_t inFeats, size_t outFeats, bool bias=true)
-            : weights_({inFeats}, T(0.0)), bias_(T(0.5)) {
+            : lastInput_({1}, T(0.0)), weights_({inFeats}, T(0.0)), bias_(T(0.5)) {
         }
 
         Tensor<T> forward(Tensor<T>& x){

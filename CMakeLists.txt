@@ -30,16 +30,16 @@ message(STATUS "pybind11_DIR: ${pybind11_DIR}")
 
 find_package(pybind11 CONFIG REQUIRED)
 
-pybind11_add_module(tensor
-    csrc/pybind/tensor_bind.cpp
+pybind11_add_module(dlf
+    csrc/pybind/bind.cpp
 )
 
-target_include_directories(tensor PRIVATE
+target_include_directories(dlf PRIVATE
     csrc
 )
 
 if(MINGW)
-    target_link_options(tensor PRIVATE
+    target_link_options(dlf PRIVATE
         -static-libgcc -static-libstdc++
         -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive
     )
