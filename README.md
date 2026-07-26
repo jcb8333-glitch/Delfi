@@ -1,2 +1,2 @@
 # ML-framework
-Another deep learning framework 
+Mini deep learning Python framework with source based in C++.
