@@ -75,3 +75,6 @@ Testing/
 
 # Testing
 test.*
+
+# Virtual environment
+.venv
