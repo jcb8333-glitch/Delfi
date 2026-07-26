@@ -4,9 +4,11 @@ project(ml_framework LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Force CMake to look at the venv's Python FIRST, before anything on PATH
+# (e.g. MSYS2's python.exe, which doesn't have pybind11 installed).
 set(Python_ROOT_DIR "${CMAKE_SOURCE_DIR}/.venv" CACHE PATH "" FORCE)
 set(Python_FIND_STRATEGY LOCATION)
-set(Python_FIND_REGISTRY NEVER)
+set(Python_FIND_REGISTRY NEVER)          # ignore any Python found via Windows registry
 set(CMAKE_FIND_FRAMEWORK NEVER)
 
 find_package(Python COMPONENTS Interpreter Development REQUIRED)
@@ -31,13 +33,16 @@ message(STATUS "pybind11_DIR: ${pybind11_DIR}")
 find_package(pybind11 CONFIG REQUIRED)
 
 pybind11_add_module(tensor
-    framework/csrc/pybind/tensor_bind.cpp
+    csrc/pybind/tensor_bind.cpp
 )
 
 target_include_directories(tensor PRIVATE
-    framework/csrc
+    csrc
 )
 
+# Statically link the MinGW runtime so the built .pyd doesn't depend on
+# MSYS2's DLLs (libstdc++-6.dll, libgcc_s_seh-1.dll, libwinpthread-1.dll)
+# being discoverable on PATH at import time.
 if(MINGW)
     target_link_options(tensor PRIVATE
         -static-libgcc -static-libstdc++
