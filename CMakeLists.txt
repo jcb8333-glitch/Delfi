@@ -37,3 +37,10 @@ pybind11_add_module(tensor
 target_include_directories(tensor PRIVATE
     framework/csrc
 )
+
+if(MINGW)
+    target_link_options(tensor PRIVATE
+        -static-libgcc -static-libstdc++
+        -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive
+    )
+endif()
