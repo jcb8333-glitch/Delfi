@@ -46,15 +46,17 @@ class Tensor {
             return out;
         }
 
-        void collect(const T& val, std::vector<size_t& outShape, std::vector<T>& outData, size_t depth){
+        void collect(const T& val, std::vector<size_t>& outShape, std::vector<T>& outData, size_t depth){
             outData.push_back(val);
         }
         template <typename U>
-        void collect(const std::vector<U>& val, std::vector<size_t> outShape, std::vector<size_t> outData, size_t depth){
-            if(outShape.size() <= depth){
-                outShape.push_back(val.size());  
+        void collect(const std::vector<U>& val, std::vector<size_t>& outShape, std::vector<T>& outData, size_t depth){
+            if (outShape.size() <= depth){
+                outShape.push_back(val.size());
+            } else if (outShape[depth] != val.size()) {
+                throw std::invalid_argument("Tensor: Uneven dimensions in input vector");
             }
-            unwrap(val, outShape, outData);
+            unwrap(val, outShape, outData, depth);
         }
 
         template <typename U>
@@ -79,7 +81,7 @@ class Tensor {
             collect(list, outShape, outData, 0);
 
             shape_ = outShape;
-            data_ = outdata;
+            data_ = outData;
             computeStrides();
         }
 
