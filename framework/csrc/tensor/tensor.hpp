@@ -6,16 +6,9 @@
 #include <ostream>
 #include <algorithm>
 
-enum class DType {
-    Float64, Float32, Float16,
-    Int64, Int32, Int16,
-    Bool, Unknown
-};
-
 template <typename T>
 class Tensor {
     private:
-        DType dType;
         std::vector<size_t> shape_;
         std::vector<size_t> strides_;
         std::vector<T> data_;
