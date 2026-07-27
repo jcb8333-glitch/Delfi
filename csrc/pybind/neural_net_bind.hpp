@@ -1,5 +1,5 @@
 #include <pybind11/pybind11.h>
-#include "../neural_net/neural_net.hpp"
+#include "../neural_net/layers.hpp"
 
 namespace py = pybind11;
 
