@@ -43,16 +43,33 @@ class Layer {
 
 template <typename T>
 class Linear : public Layer<T> {
+    private:
+        size_t inFeats_;
+        size_t outFeats_;
 
     public:
-        Linear : Layer<T>({1}, {inFeats}, T(0.5));
+        Linear(size_t inFeats, size_t outFeats, bool bias=true)
+        : Layer<T>(Tensor<T>({1, inFeats}, T(0)),
+                   Tensor<T>({outFeats, inFeats}, T(0)),
+                   Tensor<T>({outFeats}, T(0)),
+                   bias),
+            inFeats_(inFeats),
+            outFeats_(outFeats) 
+        {}
 
-        Tensor<T> forward(Tensor<T>& x){
-            lastInput_ = x;
-            Tensor<T> y = Tensor<T>::multiply(x, Tensor<T>::transpose(weights_));
-            auto& data = y.data();
-            for(size_t i = 0; i < y.size(); ++i){
-                data[i] += bias_;
+
+        Tensor<T> forward(Tensor<T>& x) override{
+            
+            this->lastInput_ = x;
+
+            Tensor<T> y = Tensor<T>::multiply(x, Tensor<T>::transpose(this->weights_));
+            
+            size_t batch = y.shape()[0];
+            if(this->useBias_){
+                for(size_t i = 0; i < batch; ++i){
+                    for(size_t j = 0; j < outFeats_; ++i)
+                        y(i, j) += this->bias(j);
+                }
             }
             return y;
         }
