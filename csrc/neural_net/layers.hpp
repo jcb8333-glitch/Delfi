@@ -30,8 +30,8 @@ class Layer {
             if(!useBias_) return;
             auto& b = bias_.data();
             const auto& grad = bGrad.data();
-            for(size_t i; i < b.size(); ++i){
-                b[i] = learningRate_ * grad[i];
+            for(size_t i = 0; i < b.size(); ++i){
+                b[i] -= learningRate_ * grad[i];
             }
         }
 
@@ -58,7 +58,7 @@ class Linear : public Layer<T> {
         {}
 
 
-        Tensor<T> forward(Tensor<T>& x) override{
+        Tensor<T> forward(const Tensor<T>& x) override{
             
             this->lastInput_ = x;
 
@@ -67,36 +67,43 @@ class Linear : public Layer<T> {
             size_t batch = y.shape()[0];
             if(this->useBias_){
                 for(size_t i = 0; i < batch; ++i){
-                    for(size_t j = 0; j < outFeats_; ++i)
-                        y(i, j) += this->bias(j);
+                    for(size_t j = 0; j < outFeats_; ++j)
+                        y(i, j) += this->bias_(j);
                 }
             }
             return y;
         }
 
-        void backward(const Tensor<T>& lGrad){
-            size_t inFeats = weights_.size();
-            size_t batchSize = lGrad.size();
+        Tensor<T> backward(const Tensor<T>& lGrad) override {
+            const auto& gradShape = lGrad.shape();
+            const auto& inputShape = this->lastInput_.shape();
 
-            Tensor<T> wGrad = Tensor<T>({inFeats}, T(0));
-            T bGrad = T(0);
+            if (gradShape.size() != 2 || gradShape[1] != outFeats_)
+                throw std::invalid_argument("Linear::backward: gradient shape mismatch");
+            if (inputShape.size() != 2 || inputShape[1] != inFeats_ || inputShape[0] != gradShape[0])
+                throw std::invalid_argument("Linear::backward: cached input shape mismatch");
 
-            const auto& gradData = lGrad.data();
-            const auto& inputData = lastInput_.data();
-            auto& wGradData = wGrad.data();
+            size_t batchSize = gradShape[0];
 
-            for (size_t i = 0; i < batchSize; ++i){
-                T g = gradData[i];
-                bGrad += g;
+            Tensor<T> ones({batchSize}, T(1));
+            Tensor<T> bGrad =
+                Tensor<T>::multiply(
+                    Tensor<T>::transpose(lGrad),
+                    ones);
 
-                size_t base = i * inFeats;
-                for (size_t j = 0; j < inFeats; ++j){
-                    wGradData[j] += g * inputData[base + j];
-                }
-            }
+            Tensor<T> wGrad =
+                Tensor<T>::multiply(
+                    Tensor<T>::transpose(lGrad),
+                    this->lastInput_);
 
-            Layer::updateWeights(wGrad);
-            Layer::updateBias(bGrad);
+            Tensor<T> xGrad =
+                Tensor<T>::multiply(
+                    lGrad,
+                    this->weights_);
+
+            this->updateWeights(wGrad);
+            this->updateBias(bGrad);
+            return xGrad;
         }
 
 };
