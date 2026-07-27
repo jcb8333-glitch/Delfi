@@ -80,3 +80,5 @@ test.*
 # Virtual environment
 .venv
 
+# Shell rebuild
+rebuild.sh
