@@ -58,7 +58,7 @@ class Linear : public Layer<T> {
         {}
 
 
-        Tensor<T> forward(const Tensor<T>& x) override{
+        Tensor<T> forward(const Tensor<T>& x) override {
             
             this->lastInput_ = x;
 

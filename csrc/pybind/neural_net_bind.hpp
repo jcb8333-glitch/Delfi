@@ -22,7 +22,7 @@ class PyModel : public Model<float> {
 void bind_neural_net(py::module_& m) {
     py::class_<Layer<float>>(m, "Layer");
 
-    py::class_<Linear<float>>(m, "Linear")
+    py::class_<Linear<float>, Layer<float>>(m, "Linear")
         .def(py::init<size_t, size_t, bool>(), py::arg("inFeats"), py::arg("outFeats"), py::arg("bias") = true)
         .def("forward", &Linear<float>::forward, py::arg("x"))
         .def("backward", &Linear<float>::backward, py::arg("lGrad"));

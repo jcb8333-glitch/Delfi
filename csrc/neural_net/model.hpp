@@ -20,7 +20,7 @@ class Model{
         void eval(){this->trainingMode_ = false;}
         bool isTraining(){return this->trainingMode_;}
         void addLayer(Layer<T>& layer){this->layers_.push_back(&layer);}
-        virtual Tensor<T> forward(const Tensor<T>& x);
+        virtual Tensor<T> forward(const Tensor<T>& x) = 0;
 
         Tensor<T> backward(const Tensor<T>& lGrad){
             Tensor<T> grad = lGrad;

@@ -110,7 +110,6 @@ class Tensor {
 
         static Tensor<T> transpose(const Tensor<T>& t){
             if (t.shape().size() == 1) {
-                // Promote {n} directly to a column {n, 1}
                 return t.reshape({t.shape()[0], 1});
             }
 
@@ -214,8 +213,12 @@ class Tensor {
         template <typename... Idx>
         T& operator()(Idx... idx) {
             std::vector<size_t> indices{static_cast<size_t>(idx)...};
+            if(indices.size() != strides_.size())
+                throw std::invalid_argument("Tensor::operator(): Index count does not match");
             size_t offset = 0;
             for (size_t i = 0; i < indices.size(); ++i){
+                if(indices[i] >= shape_[i])
+                    throw std::invalid_argument("Tenspr::operator(): Index out of bounds for dimensions"); 
                 offset += indices[i] * strides_[i];
             }
             return data_[offset];
@@ -224,8 +227,12 @@ class Tensor {
         template <typename... Idx>
         const T& operator()(Idx... idx) const {
             std::vector<size_t> indices{static_cast<size_t>(idx)...};
+            if(indices.size() != strides_.size())
+                throw std::invalid_argument("Tensor::operator(): Index count does not match");
             size_t offset = 0;
             for (size_t i = 0; i < indices.size(); ++i){
+                if(indices[i] >= shape_[i])
+                    throw std::invalid_argument("Tenspr::operator(): Index out of bounds for dimensions");
                 offset += indices[i] * strides_[i];
             }
             return data_[offset];
