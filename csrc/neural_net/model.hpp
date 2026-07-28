@@ -16,10 +16,10 @@ class Model{
 
         virtual ~Model() = default;
 
-        void train(){this->trainingMode_ = true}
-        void eval(){this->trainingMode_ = false}
+        void train(){this->trainingMode_ = true;}
+        void eval(){this->trainingMode_ = false;}
         bool isTraining(){return this->trainingMode_;}
-        void addLayer(Layer<T>& layer){this->layers_.push_back(&layer)}
+        void addLayer(Layer<T>& layer){this->layers_.push_back(&layer);}
         virtual Tensor<T> forward(const Tensor<T>& x);
 
         Tensor<T> backward(const Tensor<T>& lGrad){

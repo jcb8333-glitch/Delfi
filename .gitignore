@@ -82,6 +82,7 @@ test.*
 
 # Shell rebuild
 rebuild.sh
+rebuild.ps1
 
 # Python
 __pycache__
