@@ -16,14 +16,13 @@ class regressionTestModel(dlf.Model):
 def main():
 
     x1 = np.random.uniform(0, 5, 50)
-    x2 = np.random.uniform(0, 5, 50)
-    x_data = dlf.Tensor([[float(a), float(b)] for a,b in zip(x1,x2)])
+    x_data = dlf.Tensor([[float(a)] for a in x1])
 
     noise = np.random.normal(0, 2.0, 50)
-    y_true = 5 * x1 - x2 + 1 + noise
+    y_true = 3 * x1 + 2 + noise
     y_data = dlf.Tensor([[float(y)] for y in y_true])
 
-    model = regressionTestModel(in_dim=2, out_dim=1)
+    model = regressionTestModel(in_dim=1, out_dim=1)
     criterion = dlf.MSEloss()
 
     model.train()
@@ -68,9 +67,8 @@ def main():
                 label="True Data"
             )
 
-            x2_fixed = 2.5
             line_inputs = dlf.Tensor([
-                [float(x), x2_fixed] for x in x_line
+                [float(x)] for x in x_line
             ])
 
             line_pred = np.array(
