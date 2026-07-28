@@ -84,8 +84,10 @@ class Linear : public Layer<T> {
                 throw std::invalid_argument("Linear::backward: cached input shape mismatch");
 
             size_t batchSize = gradShape[0];
+            T scale = T(1) / static_cast<T>(batchSize);
 
             Tensor<T> ones({batchSize}, T(1));
+
             Tensor<T> bGrad =
                 Tensor<T>::multiply(
                     Tensor<T>::transpose(lGrad),
@@ -95,6 +97,9 @@ class Linear : public Layer<T> {
                 Tensor<T>::multiply(
                     Tensor<T>::transpose(lGrad),
                     this->lastInput_);
+            
+            for (auto& v : bGrad.data()) v *= scale;
+            for (auto& v : wGrad.data()) v *= scale;
 
             Tensor<T> xGrad =
                 Tensor<T>::multiply(
