@@ -1,3 +1,5 @@
+#pragma once
+
 #include "./layer.hpp"
 #include "../../tensor/tensor.hpp"
 
@@ -11,6 +13,6 @@ class ReLU{
             for(auto& v : x.data()){
                 if(v < 0){v = 0;} 
             }
-            return x
+            return x;
         }
 };

@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include "../neural_net/layers/layer.hpp"
 #include "../neural_net/layers/linear.hpp"
+#include "../neural_net/layers/relu.hpp"
 #include "../neural_net/model.hpp"
 #include "../tensor/tensor.hpp"
 
@@ -21,12 +22,8 @@ class PyModel : public Model<float> {
 };
 
 void bind_neural_net(py::module_& m) {
-    py::class_<Layer<float>>(m, "Layer");
 
-    py::class_<Linear<float>, Layer<float>>(m, "Linear")
-        .def(py::init<size_t, size_t, bool>(), py::arg("inFeats"), py::arg("outFeats"), py::arg("bias") = true)
-        .def("forward", &Linear<float>::forward, py::arg("x"))
-        .def("backward", &Linear<float>::backward, py::arg("lGrad"));
+    py::class_<Layer<float>>(m, "Layer");
 
     py::class_<Model<float>, PyModel, std::shared_ptr<Model<float>>>(m, "Model")
         .def(py::init<>())
@@ -38,7 +35,13 @@ void bind_neural_net(py::module_& m) {
         .def("backward", &Model<float>::backward, py::arg("l_grad"))
         .def("step", &Model<float>::step, py::arg("x"), py::arg("y_true"));
 
+    py::class_<Linear<float>, Layer<float>>(m, "Linear")
+        .def(py::init<size_t, size_t, bool>(), py::arg("inFeats"), py::arg("outFeats"), py::arg("bias") = true)
+        .def("forward", &Linear<float>::forward, py::arg("x"))
+        .def("backward", &Linear<float>::backward, py::arg("lGrad"));
 
-
-
-}
+    py::class_<ReLU<float>>(m, "ReLU")
+        .def(py::init<>())
+        .def("forward", &ReLU<float>::forward, py::arg("x"));
+    
+};
