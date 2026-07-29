@@ -2,6 +2,7 @@
 
 #include <random>
 #include "./layer.hpp"
+#include "./weight_init.hpp"
 #include "../../tensor/tensor.hpp"
 
 template <typename T>
@@ -10,20 +11,10 @@ class Linear : public Layer<T> {
         size_t inFeats_;
         size_t outFeats_;
 
-        static Tensor<T> makeWeights(size_t outFeats, size_t inFeats){
-            Tensor<T> w({outFeats, inFeats});
-            auto& data = w.data();
-            static thread_local std::mt19937 rng(std::random_device{}());
-            std::uniform_real_distribution<double> dist(-1.0, 1.0);
-            T scale = static_cast<T>(std::sqrt(1.0 / static_cast<double>(inFeats)));
-            for (auto& v : data) v = static_cast<T>(dist(rng)) * scale;
-            return w;
-        }
-
     public:
         Linear(size_t inFeats, size_t outFeats, bool bias=true)
         : Layer<T>(Tensor<T>({1, inFeats}, T(0)),
-                   makeWeights(outFeats, inFeats),
+                   glorot_lecun<T>(outFeats, inFeats),
                    Tensor<T>({outFeats}, T(0)),
                    bias),
             inFeats_(inFeats),
