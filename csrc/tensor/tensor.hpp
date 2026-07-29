@@ -199,6 +199,21 @@ class Tensor {
             return result;
         }
 
+        static Tensor<T> add(const Tensor<T>& a, const Tensor<T>& b){
+            if (a.shape() != b.shape()) throw std::invalid_argument("Add: Tensors are not the same shape");
+
+            std::vector<T> aData = a.data();
+            std::vector<T> bData = b.data();
+
+            Tensor<T> result(a.shape());
+
+            for(size_t i = 0; i < aData.size(); ++i){
+                result.data()[i] = aData[i] + bData[i];
+            }
+
+            return result;
+        }
+
         static Tensor<T> mean(const Tensor<T>& t){
             Tensor<T> result = Tensor<T>({1},0);
             const std::vector<T>& data = t.data();
