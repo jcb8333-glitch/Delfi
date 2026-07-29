@@ -1,5 +1,6 @@
 #include <pybind11/pybind11.h>
-#include "../neural_net/layers.hpp"
+#include "../neural_net/layers/layer.hpp"
+#include "../neural_net/layers/linear.hpp"
 #include "../neural_net/model.hpp"
 #include "../tensor/tensor.hpp"
 

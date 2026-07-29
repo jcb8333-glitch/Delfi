@@ -2,7 +2,7 @@
 
 #include <vector>
 #include "../tensor/tensor.hpp"
-#include "./layers.hpp"
+#include "./layers/linear.hpp"
 
 template <typename T>
 class Model{
