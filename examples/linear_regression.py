@@ -4,13 +4,19 @@ import numpy as np
 
 
 class regressionTestModel(dlf.Model):
-    def __init__(self, in_dim, out_dim):
+    def __init__(self, in_dim, hidden_dim, out_dim):
         super().__init__()
-        self.l1 = dlf.Linear(in_dim, out_dim)
+        self.l1 = dlf.Linear(in_dim, hidden_dim)
+        self.r1 = dlf.ReLU()
+        self.l2 = dlf.Linear(hidden_dim, out_dim)
         self.add_layer(self.l1)
+        self.add_layer(self.r1)
+        self.add_layer(self.l2)
 
     def forward(self, x):
-        return self.l1.forward(x)
+        x = self.l1.forward(x)
+        x = self.r1.forward(x)
+        return self.l2.forward(x)
 
 
 def main():
@@ -22,7 +28,7 @@ def main():
     y_true = 3 * x1 + 2 + noise
     y_data = dlf.Tensor([[float(y)] for y in y_true])
 
-    model = regressionTestModel(in_dim=1, out_dim=1)
+    model = regressionTestModel(in_dim=1, hidden_dim=16, out_dim=1)
     criterion = dlf.MSEloss()
 
     model.train()
