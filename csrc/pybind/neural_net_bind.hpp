@@ -40,8 +40,9 @@ void bind_neural_net(py::module_& m) {
         .def("forward", &Linear<float>::forward, py::arg("x"))
         .def("backward", &Linear<float>::backward, py::arg("lGrad"));
 
-    py::class_<ReLU<float>>(m, "ReLU")
+    py::class_<ReLU<float>, Layer<float>>(m, "ReLU")
         .def(py::init<>())
-        .def("forward", &ReLU<float>::forward, py::arg("x"));
+        .def("forward", &ReLU<float>::forward, py::arg("x"))
+        .def("backward", &ReLU<float>::backward, py::arg("lGrad"));
     
 };
