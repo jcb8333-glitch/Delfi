@@ -19,15 +19,20 @@ struct DeviceInfo{
 
 class Accelerator {
     public:
+        
         static bool available(){
 #ifdef DLF_CUDA
-            int count = 0;
-            cudaError_t err = cudaGetDeviceCount(&count);
-            return (err == cudaSuccess) && (count > 0);
-#else
-            return false;
+    int count = 0;
+    cudaError_t err = cudaGetDeviceCount(&count);
+    printf("cudaGetDeviceCount: err=%d (%s), count=%d\n", (int)err, cudaGetErrorString(err), count);
+    fflush(stdout);
+    return (err == cudaSuccess) && (count > 0);
+#else   
+    printf("DLF_CUDA not defined at compile time\n");
+    fflush(stdout);
+    return false;
 #endif
-        }
+}
 
         static std::vector<DeviceInfo> listDevices(){
             std::vector<DeviceInfo> devices;
@@ -36,7 +41,7 @@ class Accelerator {
             if (cudaGetDeviceCount(&count) != cudaSuccess) return devices;
             for (int i = 0; i < count; ++i){
                 cudaDeviceProp prop;
-                if (cudaDeviceProperies(&prop, i) == cudaSuccess) {
+                if (cudaGetDeviceProperties(&prop, i) == cudaSuccess) {
                     devices.push_back({i, std::string(prop.name), prop.totalGlobalMem});
                 }
             }
