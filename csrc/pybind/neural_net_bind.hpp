@@ -2,6 +2,7 @@
 #include "../neural_net/layers/layer.hpp"
 #include "../neural_net/layers/linear.hpp"
 #include "../neural_net/layers/relu.hpp"
+#include "../neural_net/layers/sigmoid.hpp"
 #include "../neural_net/model.hpp"
 #include "../tensor/tensor.hpp"
 
@@ -44,5 +45,10 @@ void bind_neural_net(py::module_& m) {
         .def(py::init<>())
         .def("forward", &ReLU<float>::forward, py::arg("x"))
         .def("backward", &ReLU<float>::backward, py::arg("lGrad"));
+
+    py::class_<Sigmoid<float>, Layer<float>>(m, "Sigmoid")
+        .def(py::init<>())
+        .def("forward", &Sigmoid<float>::forward, py::arg("x"))
+        .def("backward", &Sigmoid<float>::backward, py::arg("lGrad"));
     
 };
