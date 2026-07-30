@@ -1,6 +1,20 @@
 cmake_minimum_required(VERSION 3.15)
 project(ml_framework LANGUAGES CXX)
 
+option(DLF_CUDA "Build with CUDA support" ON)
+if(DLF_CUDA)
+    include(CheckLanguage)
+    check_language(CUDA)
+    if(CMAKE_CUDA_COMPILER)
+        enable_language(CUDA)
+        find_package(CUDAToolkit REQUIRED)
+        message(STATUS "CUDA found: ${CMAKE_CUDA_COMPILER}")
+    else()
+        message(STATUS "CUDA requested but not found")
+        set(DLF_CUDA OFF)
+    endif()
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -37,6 +51,11 @@ pybind11_add_module(_dlf
     csrc/pybind/neural_net_bind.hpp
     csrc/pybind/accelerator_bind.hpp
 )
+
+if(DLF_CUDA)
+    target_compile_definitions(_dlf PRIVATE DLF_WITH_CUDA)
+    target_link_libraries(_dlf PRIVATE CUDA::cudart)
+endif()
 
 target_include_directories(_dlf PRIVATE
     csrc
