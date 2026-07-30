@@ -35,6 +35,7 @@ pybind11_add_module(_dlf
     csrc/pybind/tensor_bind.hpp
     csrc/pybind/loss_bind.hpp
     csrc/pybind/neural_net_bind.hpp
+    csrc/pybind/accelerator_bind.hpp
 )
 
 target_include_directories(_dlf PRIVATE
