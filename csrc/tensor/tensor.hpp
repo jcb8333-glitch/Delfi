@@ -6,12 +6,16 @@
 #include <ostream>
 #include <algorithm>
 
+enum class Device {CPU,CUDA};
+
 template <typename T>
 class Tensor {
     private:
         std::vector<size_t> shape_;
         std::vector<size_t> strides_;
         std::vector<T> data_;
+        Device device_ = Device::CPU;
+        T* deviceData_ = nullptr;
 
         void computeStrides() {
             strides_.resize(shape_.size());
@@ -76,6 +80,24 @@ class Tensor {
             shape_ = outShape;
             data_ = outData;
             computeStrides();
+        }
+
+        Device device()const{return this->device_;}
+
+        void to(Device d){
+            if (d == this->device_) return;
+
+        #ifdef DLF_CUDA
+            if (d == Device::CUDA){
+                cudaMalloc(&deviceData_, data.size() * sizeof(T), cudaMemcpyHostToDevice);
+                cudaMemcpy(deviceData_, data_.data(), data.size() * sizeof(T), cudaMemcpyDeviceToHost);
+                cudaFree(deviceData_);
+                deviceData_ = nullptr;
+            }
+            device_ = d;
+        #else
+            throw std::runtime_error("Tensor::to: CUDA support not compiled");
+        #endif
         }
 
         static Tensor<T> clone(const Tensor<T>& t){
