@@ -40,7 +40,23 @@ class Softmax : public Layer<T>{
         }
         
         Tensor<T> backward(const Tensor<T>& lGrad) override {
-            
+            Tensor<T> xGrad = (lGrad.shape(), T(0));
+            auto& data = x.data();
+            size_t batch = lGrad.shape()[0];
+            size_t feats = lGrad.shape()[1];
+
+            for(auto b = 0uz; b < batch; ++b){
+                size_t base = b * feats;
+                for(i = 0uz; i < batch; ++i){
+                    T sum = T(0);
+                    for(auto j = 0uz; j < feats; ++j){
+                        T kronecker = (i==j) ? T(1) : 0;
+                        sum += g[base + j] * a[base + j] * (kronecker - s[base + i]);
+                    }
+                    data[base+i] = sum;
+                }
+            }
+            return xGrad;
         }
 
 };
