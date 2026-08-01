@@ -8,7 +8,7 @@ template <typename T>
 class Softmax : public Layer<T>{
 
     public:
-        Softmax(size_t dims)
+        Softmax()
         : Layer<T>(Tensor<T>({1}, T(0)),
                    Tensor<T>({1}, T(0)),
                    Tensor<T>({1}, T(0)),
@@ -25,7 +25,7 @@ class Softmax : public Layer<T>{
                 size_t batchStart = b * feats;
                 T maxVal = data[batchStart];
                 for(auto i = 0uz; i < feats; ++i){
-                    maxVal = std::max(maxVal, data[batchStart + j]);
+                    maxVal = std::max(maxVal, data[batchStart + i]);
                 }
                 T sum = 0;
                 for(auto j = 0uz; j < feats; ++j){
@@ -41,21 +41,22 @@ class Softmax : public Layer<T>{
         }
         
         Tensor<T> backward(const Tensor<T>& lGrad) override {
-            Tensor<T> xGrad = (lGrad.shape(), T(0));
-            auto& data = x.data();
+            Tensor<T> xGrad(lGrad.shape(), T(0));
+            auto& data = xGrad.data();
+            const auto& g = lGrad.data();
+            const auto& s = this->lastInput_.data();
             size_t batch = lGrad.shape()[0];
             size_t feats = lGrad.shape()[1];
 
-            for(auto b = 0uz; b < batch; ++b){
+            for (auto b = 0uz; b < batch; ++b) {
                 size_t base = b * feats;
-                for(i = 0uz; i < batch; ++i){
-                    T sum = T(0);
-                    for(auto j = 0uz; j < feats; ++j){
-                        T kronecker = (i==j) ? T(1) : 0;
-                        sum += g[base + j] * a[base + j] * (kronecker - s[base + i]);
-                    }
-                    data[base+i] = sum;
-                }
+
+                T dot = T(0);
+                for (auto j = 0uz; j < feats; ++j)
+                    dot += g[base + j] * s[base + j];
+
+                for (auto i = 0uz; i < feats; ++i)
+                    data[base + i] = s[base + i] * (g[base + i] - dot);
             }
             return xGrad;
         }
