@@ -6,6 +6,10 @@
 #include <ostream>
 #include <algorithm>
 
+#ifdef DLF_CUDA
+    #include <cuda_runtime.h>
+#endif
+
 enum class Device {CPU,CUDA};
 
 template <typename T>

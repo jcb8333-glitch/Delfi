@@ -20,25 +20,27 @@ class Softmax : public Layer<T>{
             size_t feats = x.shape()[1];
             auto& data = y.data();
 
-            for(size_t b = 0; b < batch; ++b){
-                size_t base = b * feats;
-                T maxVal = data[base];
-                for(size_t i = 1; i < feats; ++i){
-                    maxVal = std::max(maxVal, data[base + j]);
+            for(auto b = 0uz; b < batch; ++b){
+                size_t batchStart = b * feats;
+                T maxVal = data[batchStart];
+                for(auto i = 0uz; i < feats; ++i){
+                    maxVal = std::max(maxVal, data[batchStart + j]);
                 }
                 T sum = 0;
-                for(size_t j = 0; j < feats; ++j){
-                    data[base + j] = std::exp(data[base + j]-maxVal);
-                    sum += data[base + j];
+                for(auto j = 0uz; j < feats; ++j){
+                    data[batchStart + j] = std::exp(data[batchStart + j]-maxVal);
+                    sum += data[batchStart + j];
                 }
-                for (size_t i = 0; i < feats; ++i){
-                    data[base + i] /= sum;
+                for (auto i = 0uz; i < feats; ++i){
+                    data[batchStart + i] /= sum;
                 }
             }
             this->lastInput_ = y;
             return y;
         }
         
-        Tensor<T> backward(const Tensor<T>& lGrad) override {}
+        Tensor<T> backward(const Tensor<T>& lGrad) override {
+            
+        }
 
 };
