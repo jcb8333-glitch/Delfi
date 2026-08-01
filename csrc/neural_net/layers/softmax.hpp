@@ -1,3 +1,4 @@
+#pragma once
 
 #include <cmath>
 #include "./layer.hpp"
@@ -58,5 +59,4 @@ class Softmax : public Layer<T>{
             }
             return xGrad;
         }
-
 };
