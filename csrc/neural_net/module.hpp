@@ -2,29 +2,54 @@
 
 #include <vector>
 #include "../tensor/tensor.hpp"
-#include "./layers/linear.hpp"
+#include "./layers/layer.hpp"
 
 template <typename T>
-class Module{
+class Module : public Layer{
     protected:
         bool trainingMode_;
-        std::vector<Layer<T>*> layers_;
+        std::vector<Layer<T>*> children_;
 
-        Module() : trainingMode_(false){}
+        Module() : Layer<T>(
+            Tensor<T>({1}, T(0)),
+            Tensor<T>({1}, T(0)),
+            Tensor<T>({1}, T(0)),
+            false
+        ),
+        trainingMode_(false){}
 
     public:
 
         virtual ~Module() = default;
 
-        void train(){this->trainingMode_ = true;}
-        void eval(){this->trainingMode_ = false;}
+        void train(){
+            trainingMode_ = true;
+            for(auto* child : children_){
+                if(auto* m = dynamic_cast<Module<T>*>(child){
+                    m->train();
+                }
+            }
+        }
+
+        void eval(){
+            trainingMode_ = false;
+            for(auto* child : children_){
+                if(auto* m = dynamic_cast<Module<T>*>(child)){
+                    m-eval();
+                }
+            }
+        }
+
         bool isTraining(){return this->trainingMode_;}
-        void addLayer(Layer<T>& layer){this->layers_.push_back(&layer);}
+
+        void addLayer(Layer<T>& layer){this->children_.push_back(&layer);}
+        void addSubmodule(Module<T>& submod){this->submods_.push_back(&submod);}
+
         virtual Tensor<T> forward(const Tensor<T>& x) = 0;
 
         Tensor<T> backward(const Tensor<T>& lGrad){
             Tensor<T> grad = lGrad;
-            for(auto i = layers_.rbegin(); i != layers_.rend(); ++i){
+            for(auto i = children_.rbegin(); i != children_.rend(); ++i){
                 grad = (*i)->backward(grad);
             }
             return grad;
