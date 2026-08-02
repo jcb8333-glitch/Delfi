@@ -26,12 +26,13 @@ void bind_neural_net(py::module_& m) {
 
     py::class_<Layer<float>>(m, "Layer");
 
-    py::class_<Module<float>, PyModel, std::shared_ptr<Module<float>>>(m, "Module")
+    py::class_<Module<float>, Layer<float>, PyModel, std::shared_ptr<Module<float>>>(m, "Module")
         .def(py::init<>())
         .def("train", &Module<float>::train)
         .def("eval", &Module<float>::eval)
         .def("is_training", &Module<float>::isTraining)
         .def("add_layer", &Module<float>::addLayer, py::arg("layer"), py::keep_alive<1,2>())
+        .def("add_module", &Module<float>::addSubmodule, py::arg("Submodule"), py::keep_alive<1,2>())
         .def("forward", &Module<float>::forward, py::arg("x"))
         .def("backward", &Module<float>::backward, py::arg("l_grad"))
         .def("step", &Module<float>::step, py::arg("x"), py::arg("y_true"));
