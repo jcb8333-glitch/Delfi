@@ -43,7 +43,7 @@ class Module : public Layer<T>{
         bool isTraining(){return this->trainingMode_;}
 
         void addLayer(Layer<T>& layer){this->children_.push_back(&layer);}
-        void addSubmodule(Module<T>& submod){this->submods_.push_back(&submod);}
+        void addSubmodule(Module<T>& submod){this->children_.push_back(&submod);}
 
         virtual Tensor<T> forward(const Tensor<T>& x) = 0;
 
