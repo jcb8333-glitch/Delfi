@@ -1,4 +1,4 @@
-import dlf
+import delfi as dlf
 import matplotlib.pyplot as plt
 import numpy as np
 

@@ -5,7 +5,7 @@
 #include "./layers/layer.hpp"
 
 template <typename T>
-class Module : public Layer{
+class Module : public Layer<T>{
     protected:
         bool trainingMode_;
         std::vector<Layer<T>*> children_;
@@ -25,7 +25,7 @@ class Module : public Layer{
         void train(){
             trainingMode_ = true;
             for(auto* child : children_){
-                if(auto* m = dynamic_cast<Module<T>*>(child){
+                if(auto* m = dynamic_cast<Module<T>*>(child)){
                     m->train();
                 }
             }
@@ -35,7 +35,7 @@ class Module : public Layer{
             trainingMode_ = false;
             for(auto* child : children_){
                 if(auto* m = dynamic_cast<Module<T>*>(child)){
-                    m-eval();
+                    m->eval();
                 }
             }
         }

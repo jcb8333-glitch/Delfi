@@ -44,7 +44,7 @@ message(STATUS "pybind11_DIR: ${pybind11_DIR}")
 
 find_package(pybind11 CONFIG REQUIRED)
 
-pybind11_add_module(_dlf
+pybind11_add_module(_delfi
     csrc/pybind/bind.cpp
     csrc/pybind/tensor_bind.hpp
     csrc/pybind/loss_bind.hpp
@@ -53,23 +53,23 @@ pybind11_add_module(_dlf
 )
 
 if(DLF_CUDA)
-    target_compile_definitions(_dlf PRIVATE DLF_CUDA)
-    target_link_libraries(_dlf PRIVATE CUDA::cudart)
+    target_compile_definitions(_delfi PRIVATE DLF_CUDA)
+    target_link_libraries(_delfi PRIVATE CUDA::cudart)
 endif()
 
-target_include_directories(_dlf PRIVATE
+target_include_directories(_delfi PRIVATE
     csrc
 )
 
-set_target_properties(_dlf PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/dlf
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/dlf
-    LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/dlf
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/dlf
+set_target_properties(_delfi PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/delfi
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/delfi
+    LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/delfi
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/delfi
 )
 
 if(MINGW)
-    target_link_options(_dlf PRIVATE
+    target_link_options(_delfi PRIVATE
         -static-libgcc -static-libstdc++
         -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive
     )
