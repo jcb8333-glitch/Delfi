@@ -5,16 +5,16 @@
 #include "./layers/linear.hpp"
 
 template <typename T>
-class Model{
+class Module{
     protected:
         bool trainingMode_;
         std::vector<Layer<T>*> layers_;
 
-        Model() : trainingMode_(false){}
+        Module() : trainingMode_(false){}
 
     public:
 
-        virtual ~Model() = default;
+        virtual ~Module() = default;
 
         void train(){this->trainingMode_ = true;}
         void eval(){this->trainingMode_ = false;}

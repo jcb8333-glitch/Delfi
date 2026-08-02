@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-class regressionTestModel(dlf.Model):
+class regressionTestModel(dlf.Module):
     def __init__(self, in_dim, hidden_dim, out_dim):
         super().__init__()
         self.l1 = dlf.Linear(in_dim, hidden_dim)
