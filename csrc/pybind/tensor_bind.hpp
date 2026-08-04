@@ -24,5 +24,6 @@ void bind_tensor(py::module_& m) {
         .def_static("transpose", &Tensor<float>::transpose)
         .def_static("multiply", &Tensor<float>::multiply)
         .def_static("subtract", &Tensor<float>::subtract)
+        .def_static("add", &Tensor<float>::add)
         .def("__str__", &Tensor<float>::toString);
 }
