@@ -20,12 +20,18 @@ __global__ void taddKernel(const float* A, const float* B, float* C, size_t nRow
         int index = row * numCols + col;
         c[index] = A[index] + B[index];
     }
-
 }
 
 void launchTMul(const float* A, const float* B, float* C,size_t M, size_t K, size_t N){
     dim3 block(16, 16);
     dim3 grid((N + 15) / 16, (M + 15) / 16);
     tmulKernel<<<grid, block>>>(A, B, C, M, K, N);
+    cudaDeviceSynchronize();
+}
+
+void launchTAdd(const float* A, const float* B, float* C, size_t nRows, size_t nCols){
+    dim3 block(16, 16);
+    dim3 grid((nCols + block.x-1)/block.x, (nRows + block.y-1)/block.y);
+    taddKernel<<<grid, block>>>(A, B, C, nRows, nCols);
     cudaDeviceSynchronize();
 }
