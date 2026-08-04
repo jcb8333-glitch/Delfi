@@ -253,7 +253,7 @@ class Tensor {
                 if(a.device() == Device::CUDA && b.device() == Device::CUDA){
                     if constexpr (std::is_same_v<T, float>){
                         result.to(Device::CUDA);
-                        launchTAdd(a.deviceData_.get(), b.deviceData_.get(), result.deviceData_.get(), a.size());
+                        launchTSub(a.deviceData_.get(), b.deviceData_.get(), result.deviceData_.get(), a.size());
                     } else {
                         throw std::runtime_error("CUDA TAdd currently only supports float");
                     }
@@ -262,7 +262,7 @@ class Tensor {
             {
                 std::vector<T> aData = a.data();
                 std::vector<T> bData = b.data();
-                
+
                 for(size_t i = 0; i < aData.size(); ++i){
                     result.data()[i] = aData[i] - bData[i];
                 }

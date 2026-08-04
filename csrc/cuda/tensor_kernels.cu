@@ -50,7 +50,7 @@ void launchTAdd(const float* A, const float* B, float* C, size_t n){
 void launchTSub(const float* A, const float* B, float* C, size_t n){
     unsigned int threads = 256;
     unsigned int blocks = (unsigned int)((n + threads - 1) / threads);
-    taddKernel<<<blocks, threads>>>(A, B, C, n);
+    tsubKernel<<<blocks, threads>>>(A, B, C, n);
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess) throw std::runtime_error(std::string("TSubKernel launch failed") + cudaGetErrorString(err));
     cudaDeviceSynchronize();
