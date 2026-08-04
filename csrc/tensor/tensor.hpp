@@ -5,6 +5,7 @@
 #include <string>
 #include <ostream>
 #include <algorithm>
+#include <memory>
 
 #ifdef DLF_CUDA
     #include <cuda_runtime.h>
@@ -19,7 +20,7 @@ class Tensor {
         std::vector<size_t> strides_;
         std::vector<T> data_;
         Device device_ = Device::CPU;
-        T* deviceData_ = nullptr;
+        std::shared_ptr<T> deviceData_ = nullptr;
 
         void computeStrides() {
             strides_.resize(shape_.size());
@@ -92,18 +93,23 @@ class Tensor {
             if (d == this->device_) return;
 
         #ifdef DLF_CUDA
-            if (d == Device::CUDA){
-                cudaMalloc(&deviceData_, data_.size() * sizeof(T));
-                cudaMemcpy(deviceData_, data_.data(), data_.size() * sizeof(T), cudaMemcpyHostToDevice);
+            if (d == Device::CUDA) {
+                size_t n = data_.size();
+                T* raw = nullptr;
+                cudaMalloc(&raw, n * sizeof(T));
+                cudaMemcpy(raw, data_.data(), n * sizeof(T), cudaMemcpyHostToDevice);
+
+                deviceData_ = std::shared_ptr<T>(raw, [](T* p){ cudaFree(p); });
+
                 data_.clear();
                 data_.shrink_to_fit();
             } else {
                 size_t n = 1;
                 for (auto dim : shape_) n *= dim;
                 data_.resize(n);
-                cudaMemcpy(data_.data(), deviceData_, n * sizeof(T), cudaMemcpyDeviceToHost);
-                cudaFree(deviceData_);
-                deviceData_ = nullptr;
+                cudaMemcpy(data_.data(), deviceData_.get(), n * sizeof(T), cudaMemcpyDeviceToHost);
+
+                deviceData_.reset();  // triggers the custom deleter -> cudaFree, safely
             }
             device_ = d;
         #else
