@@ -13,6 +13,7 @@ void bind_tensor(py::module_& m) {
         .def("data", static_cast<std::vector<float>& (Tensor<float>::*)()>(&Tensor<float>::data))
         .def("size", &Tensor<float>::size)
         .def("shape", &Tensor<float>::shape)
+        .def("to", &Tensor<float>::to, py::arg("device"))
         .def("reshape", &Tensor<float>::reshape, py::arg("new_shape"))
         .def_static("transpose", &Tensor<float>::transpose)
         .def_static("multiply", &Tensor<float>::multiply)
