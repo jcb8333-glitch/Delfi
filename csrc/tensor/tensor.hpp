@@ -93,8 +93,15 @@ class Tensor {
 
         #ifdef DLF_CUDA
             if (d == Device::CUDA){
-                cudaMalloc(&deviceData_, data.size() * sizeof(T), cudaMemcpyHostToDevice);
-                cudaMemcpy(deviceData_, data_.data(), data.size() * sizeof(T), cudaMemcpyDeviceToHost);
+                cudaMalloc(&deviceData_, data_.size() * sizeof(T));
+                cudaMemcpy(deviceData_, data_.data(), data_.size() * sizeof(T), cudaMemcpyHostToDevice);
+                data_.clear();
+                data_.shrink_to_fit();
+            } else {
+                size_t n = 1;
+                for (auto dim : shape_) n *= dim;
+                data_.resize(n);
+                cudaMemcpy(data_.data(), deviceData_, n * sizeof(T), cudaMemcpyDeviceToHost);
                 cudaFree(deviceData_);
                 deviceData_ = nullptr;
             }
