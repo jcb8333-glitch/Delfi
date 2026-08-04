@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <string>
 
 #ifdef DLF_CUDA
     #include <cuda_runtime.h>
@@ -34,7 +35,7 @@ void launchTAdd(const float* A, const float* B, float* C, size_t n){
     unsigned int blocks = (unsigned int)((n + threads - 1) / threads);
     taddKernel<<<blocks, threads>>>(A, B, C, n);
     cudaError_t err = cudaGetLastError();
-    if (err != cudaSuccess) throw std::runtime_error("TAddKernel launch failed");
+    if (err != cudaSuccess) throw std::runtime_error(std::string("TAddKernel launch failed") + cudaGetErrorString(err));
     cudaDeviceSynchronize();
     if (err != cudaSuccess) throw std::runtime_error("TAddKernel execution failed");
 }

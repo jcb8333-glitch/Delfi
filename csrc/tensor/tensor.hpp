@@ -131,6 +131,11 @@ class Tensor {
         }
 
         size_t size() const {
+            if (device_ == Device::CUDA){
+                size_t n = 1;
+                for (auto dim : shape_) n *= dim;
+                return n;
+            }
             return data_.size();
         }
 
