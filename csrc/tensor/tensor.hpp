@@ -259,6 +259,17 @@ class Tensor {
 
             Tensor<T> result(a.shape());
 
+            #ifdef DLF_CUDA
+                if(a.device() == Device::CUDA && b.device() == Device::CUDA){
+                    if constexpr (std::is_same_v<T, float>){
+                        result.to(Device::CUDA);
+                        launchTAdd(a.deviceData_.get(), b.deviceData_.get(), result.shape[0], result.shape[1]);
+                    } else {
+                        throw std::runtime_error("CUDA TAdd currently only supports float");
+                    }
+                } else
+            #endif
+
             for(size_t i = 0; i < aData.size(); ++i){
                 result.data()[i] = aData[i] + bData[i];
             }
