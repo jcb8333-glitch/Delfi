@@ -13,6 +13,16 @@ __global__ void tmulKernel(const float* A, const float* B, float* C, size_t M, s
     }
 }
 
+__global__ void taddKernel(const float* A, const float* B, float* C, size_t nRows, size_t nCols){
+    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
+    if(row < nRows && col < numCols){
+        int index = row * numCols + col;
+        c[index] = A[index] + B[index];
+    }
+
+}
+
 void launchTMul(const float* A, const float* B, float* C,size_t M, size_t K, size_t N){
     dim3 block(16, 16);
     dim3 grid((N + 15) / 16, (M + 15) / 16);
