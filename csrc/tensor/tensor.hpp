@@ -6,6 +6,7 @@
 #include <ostream>
 #include <algorithm>
 #include <memory>
+#include "./tensor/tensor_kernels.hpp"
 
 #ifdef DLF_CUDA
     #include <cuda_runtime.h>
@@ -183,7 +184,7 @@ class Tensor {
 
             if ((aShape.size() != 1 && aShape.size() != 2) ||
                 (bShape.size() != 1 && bShape.size() != 2))
-                throw std::invalid_argument("matmul supports only 1D or 2D tensors");
+                throw std::invalid_argument("TMul supports only 1D or 2D tensors");
 
             bool aWasVector = (aShape.size() == 1);
             bool bWasVector = (bShape.size() == 1);
@@ -203,15 +204,27 @@ class Tensor {
 
             Tensor<T> result({M, N});
 
-            for (size_t i = 0; i < M; ++i){
-                for (size_t j = 0; j < N; ++j){
-                    T sum = T();
-                    for (size_t k = 0; k < K; ++k){
-                        sum += aPromoted(i, k) * bPromoted(k, j);
+            #ifdef DLF_CUDA
+                if (a.device() == Device::CUDA && b.device() == Device::CUDA){
+                    if constexpr (std::is_same_v<T, float>){
+                        result.to(Device::CUDA);
+                        launchTMul(aPromoted.deviceData_.get(), bPromoted.deviceData_.get(), result.deviceData_.get(), M, K, N);
+                    } else {
+                        throw std::runtime_error("CUDA TMul currently only supports float");
                     }
-                    result(i, j) = sum;
+                } else
+            #endif
+                {
+                    for (size_t i = 0; i < M; ++i){
+                        for (size_t j = 0; j < N; ++j){
+                            T sum = T();
+                            for (size_t k = 0; k < K; ++k){
+                                sum += aPromoted(i, k) * bPromoted(k, j);
+                            }
+                            result(i, j) = sum;
+                        }
+                    }
                 }
-            }
 
             if (aWasVector && bWasVector) {
                 return result.reshape({});

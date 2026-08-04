@@ -47,6 +47,7 @@ find_package(pybind11 CONFIG REQUIRED)
 pybind11_add_module(_delfi
     csrc/pybind/bind.cpp
     csrc/pybind/tensor_bind.hpp
+    csrc/cuda/tensor_kernels.cu
     csrc/pybind/loss_bind.hpp
     csrc/pybind/neural_net_bind.hpp
     csrc/pybind/accelerator_bind.hpp
