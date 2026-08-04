@@ -6,7 +6,7 @@
 #include <ostream>
 #include <algorithm>
 #include <memory>
-#include "./tensor/tensor_kernels.hpp"
+#include "./tensor_kernels.hpp"
 
 #ifdef DLF_CUDA
     #include <cuda_runtime.h>
@@ -110,7 +110,7 @@ class Tensor {
                 data_.resize(n);
                 cudaMemcpy(data_.data(), deviceData_.get(), n * sizeof(T), cudaMemcpyDeviceToHost);
 
-                deviceData_.reset();  // triggers the custom deleter -> cudaFree, safely
+                deviceData_.reset();
             }
             device_ = d;
         #else
@@ -254,26 +254,26 @@ class Tensor {
         static Tensor<T> add(const Tensor<T>& a, const Tensor<T>& b){
             if (a.shape() != b.shape()) throw std::invalid_argument("Add: Tensors are not the same shape");
 
-            std::vector<T> aData = a.data();
-            std::vector<T> bData = b.data();
-
             Tensor<T> result(a.shape());
 
             #ifdef DLF_CUDA
                 if(a.device() == Device::CUDA && b.device() == Device::CUDA){
                     if constexpr (std::is_same_v<T, float>){
                         result.to(Device::CUDA);
-                        launchTAdd(a.deviceData_.get(), b.deviceData_.get(), result.shape[0], result.shape[1]);
+                        launchTAdd(a.deviceData_.get(), b.deviceData_.get(), result.deviceData_.get(), a.size());
                     } else {
                         throw std::runtime_error("CUDA TAdd currently only supports float");
                     }
                 } else
             #endif
+            {
+                std::vector<T> aData = a.data();
+                std::vector<T> bData = b.data();
 
-            for(size_t i = 0; i < aData.size(); ++i){
-                result.data()[i] = aData[i] + bData[i];
+                for(size_t i = 0; i < aData.size(); ++i){
+                    result.data()[i] = aData[i] + bData[i];
+                }
             }
-
             return result;
         }
 
