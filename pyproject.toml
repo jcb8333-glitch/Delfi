@@ -1,0 +1,20 @@
+[build-system]
+requires = ["scikit-build-core>=0.8", "pybind11>=3.0"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "delfi"
+version = "0.1.0"
+description = "A small C++/CUDA-backed tensor and neural network library with Python bindings."
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.scikit-build]
+cmake.source-dir = "."
+
+cmake.build-type = "Release"
+
+wheel.packages = ["delfi"]
+
+[tool.scikit-build.cmake.define]
+CMAKE_LIBRARY_OUTPUT_DIRECTORY = "delfi"
