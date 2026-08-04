@@ -2,4 +2,5 @@
 #ifdef DLF_CUDA
 void launchTMul(const  float* A, const float* B, float* C, size_t M, size_t K, size_t N);
 void launchTAdd(const  float* A, const float* B, float* C, size_t n);
+void launchTSub(const  float* A, const float* B, float* C, size_t n);
 #endif
