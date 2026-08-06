@@ -3,7 +3,6 @@
 #include <random>
 #include "./layer.hpp"
 #include "./weight_init.hpp"
-#include "../../tensor/tensor.hpp"
 
 template <typename T>
 class Linear : public Layer<T> {

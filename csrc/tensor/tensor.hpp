@@ -88,6 +88,13 @@ class Tensor {
             computeStrides();
         }
 
+        static Tensor<T> zeros(size_t rows, size_t cols){
+            return Tensor({rows, cols}, 0);
+        }
+        static Tensor<T> ones(size_t rows, size_t cols){
+            return Tensor({rows, cols}, 1);
+        }
+
         Device device()const{return this->device_;}
 
         void to(Device d){

@@ -15,6 +15,8 @@ void bind_tensor(py::module_& m) {
         .def(py::init<std::vector<size_t>, const float&>(), py::arg("shape"), py::arg("initial_val") = 0.0f)
         .def(py::init<std::vector<float>>(), py::arg("list_data"))
         .def(py::init<std::vector<std::vector<float>>>(), py::arg("list_data"))
+        .def_static("zeros", &Tensor<float>::zeros)
+        .def_static("ones", &Tensor<float>::ones)
         .def("device", &Tensor<float>::device)
         .def("data", static_cast<std::vector<float>& (Tensor<float>::*)()>(&Tensor<float>::data))
         .def("size", &Tensor<float>::size)
