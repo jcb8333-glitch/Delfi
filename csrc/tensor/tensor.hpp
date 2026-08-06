@@ -303,15 +303,20 @@ class Tensor {
             return result;
         }
 
-        static Tensor<T> mean(const Tensor<T>& t){
-            Tensor<T> result = Tensor<T>({1},0);
+        static Tensor<T> mean(const Tensor<T>& t, bool keepDims){
             const std::vector<T>& data = t.data();
-
-            for(size_t i = 0; i < data.size(); ++i){
-                result(0) += data[i];
+            T mean = T(0);
+            for(auto i = 0uz; i < data.size(); ++i){
+                mean += data[i];
             }
-            result(0) /= t.size();
-            return result;
+            mean /= static_cast<T>(data.size());
+            if(keepDims){
+                std::vector<size_t> outShape(t.shape().size(), 1);
+                Tensor<T> result(outShape, mean);
+                return result;
+            } else {
+                return Tensor<T>({1}, mean);
+            }
         }
 
         template <typename... Idx>

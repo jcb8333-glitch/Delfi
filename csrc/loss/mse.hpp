@@ -21,7 +21,7 @@ class MSEloss{
             }
 
             lastDiff_ = diff;
-            return Tensor<T>::mean(square);
+            return Tensor<T>::mean(square, false);
         }
 
         Tensor<T> backward(){

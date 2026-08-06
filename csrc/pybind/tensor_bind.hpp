@@ -24,6 +24,7 @@ void bind_tensor(py::module_& m) {
         .def("to", &Tensor<float>::to, py::arg("device"))
         .def("reshape", &Tensor<float>::reshape, py::arg("new_shape"))
         .def_static("transpose", &Tensor<float>::transpose)
+        .def_static("mean", &Tensor<float>::mean, py::arg("x"), py::arg("keep_dims") = false)
         .def_static("multiply", &Tensor<float>::multiply)
         .def_static("subtract", &Tensor<float>::subtract)
         .def_static("add", &Tensor<float>::add)
